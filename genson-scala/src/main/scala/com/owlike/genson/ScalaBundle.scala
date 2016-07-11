@@ -20,6 +20,7 @@ class ScalaBundle extends GensonBundle {
       .withConverterFactory(new TupleConverterFactory())
       .withConverterFactory(new OptionConverterFactory())
       .withBeanPropertyFactory(new ScalaBeanPropertyFactory(builder.getClassLoader))
+      .`with`(new StandardMutaAccessorResolver(VisibilityFilter.PRIVATE, VisibilityFilter.NONE, VisibilityFilter.PRIVATE))
   }
 
   def useOnlyConstructorFields(enable: Boolean): ScalaBundle = {
@@ -33,7 +34,6 @@ class ScalaBundle extends GensonBundle {
                                             propertyNameResolver: PropertyNameResolver,
                                             builder: GensonBuilder): BeanDescriptorProvider = {
     val caseClassPropertyResolver = new CompositeResolver(util.Arrays.asList(
-      new StandardMutaAccessorResolver(VisibilityFilter.PRIVATE, VisibilityFilter.NONE, VisibilityFilter.PRIVATE),
       propertyResolver)
     )
 
