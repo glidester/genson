@@ -1,6 +1,6 @@
 package com.owlike.genson
 
-import org.scalatest.{Matchers, FunSuite}
+import org.scalatest.{FunSuite, Matchers}
 import defaultGenson._
 
 class ScalaPojoRoundTripTest extends FunSuite with Matchers {
@@ -97,5 +97,31 @@ class ScalaPojoRoundTripTest extends FunSuite with Matchers {
   test("Ser/de root complex array") {
     val expected = Array(Array(Seq(BasicPoso("foo", 2, true))))
     fromJson[Array[Array[Seq[BasicPoso]]]](toJson(expected)) should be (expected)
+  }
+
+  test("Exclude property from json when excluded using GensonBuilder") {
+    val genson = new GensonBuilder()
+      .withBundle(ScalaBundle())
+      .exclude("aInt")
+      .create()
+
+    genson.toJson(BaseClass(3)) should be ("{}")
+  }
+
+  ignore("Rename property from json with GensonBuilder") {
+    val genson = new GensonBuilder()
+      .withBundle(ScalaBundle())
+      .rename("aInt", "renamedInt")
+      .create()
+
+
+    genson.toJson(BaseClass(3)) should be ("""{"renamedInt":3}""")
+  }
+
+  test("class with value class in it should be properly serialized and then deserialized back") {
+    val ent = MyEntity(MyAmount(1L))
+    val json = toJson(ent)
+    json shouldEqual """{"amount":1}"""
+    fromJson[MyEntity](json) shouldEqual ent
   }
 }
